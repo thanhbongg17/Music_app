@@ -4,25 +4,26 @@ import 'package:fl_chart/fl_chart.dart';
 import 'audio_manager.dart';
 import 'app_colors.dart';
 import 'mini_player.dart';
+
 Color hexToColor(String hex) {
   hex = hex.replaceAll('#', '').replaceAll('0x', '').trim();
   if (hex.length == 6) hex = 'FF$hex'; // Thêm alpha nếu thiếu
   return Color(int.parse(hex, radix: 16));
 }
+
 final player = AudioManager().player;
-class Music_Chart extends StatefulWidget{
+
+class Music_Chart extends StatefulWidget {
   List<Map<String, dynamic>> playlist = [];
   final int index;
-  Music_Chart({
-    Key? key,
-    required this.playlist,
-    required this.index,
-}): super(key: key);
+  Music_Chart({Key? key, required this.playlist, required this.index})
+    : super(key: key);
 
   @override
   State<Music_Chart> createState() => _MusicChart();
 }
-class _MusicChart extends State<Music_Chart>{
+
+class _MusicChart extends State<Music_Chart> {
   int _selectedIndex = 0;
   List<Map<String, dynamic>> _topSongs = [];
   @override
@@ -30,26 +31,28 @@ class _MusicChart extends State<Music_Chart>{
     super.initState();
     fetchTopSongs().then((songs) => setState(() => _topSongs = songs));
   }
+
   @override
-  Future<List<Map<String, dynamic>>> fetchTopSongs() async{
+  Future<List<Map<String, dynamic>>> fetchTopSongs() async {
     final response = await Supabase.instance.client
         .from('songs')
         .select()
         .order('rank', ascending: true)
         .limit(100);
-    return List<Map<String,dynamic>>.from(response);
+    return List<Map<String, dynamic>>.from(response);
   }
+
   final List<Widget> _pages = [
     // Toàn bộ `Column` hiện tại bạn đang dùng => đặt thành 1 widget riêng
     // Hoặc tạm thời:
     Placeholder(), // Trang Thư viện
     Center(child: Text('khám phá')),
-    Music_Chart(playlist: [], index: 0,),
+    Music_Chart(playlist: [], index: 0),
     Center(child: Text('Phòng nhạc')),
     Center(child: Text('Cá nhân')),
     Center(child: Text('Cá nhân')),
   ];
-  Widget buildNavItem(IconData icon, String label,  int index) {
+  Widget buildNavItem(IconData icon, String label, int index) {
     //icon: là biểu tượng của nút
     //label là tên bên dưới icon
     //index là số thứ tự của nút
@@ -61,10 +64,10 @@ class _MusicChart extends State<Music_Chart>{
         // khi nhấn vào nút, cập nhật _selectedIndex để hiển thị nút được chọn.
         setState(() {
           //gọi setState để cập nhật _selectedIndex => widget build lại.
-            // 👉 Các tab khác vẫn hoạt động bình thường
-            setState(() {
-              _selectedIndex = index;
-            });
+          // 👉 Các tab khác vẫn hoạt động bình thường
+          setState(() {
+            _selectedIndex = index;
+          });
         });
       },
       child: Column(
@@ -74,15 +77,19 @@ class _MusicChart extends State<Music_Chart>{
           Icon(icon, color: isSelected ? AppColors.menu3Color : Colors.white),
           SizedBox(height: 4),
           // text bên dưới
-          Text(label, style: TextStyle(
-            fontSize: 12,
-            color: isSelected ? AppColors.menu3Color : Colors.white70,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          )),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11.9,
+              color: isSelected ? AppColors.menu3Color : Colors.white70,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
   }
+
   // hàm hiển thị trend_points
   LineChartData generateChart(List<int> points) {
     if (points.isEmpty) return LineChartData();
@@ -147,8 +154,8 @@ class _MusicChart extends State<Music_Chart>{
       gridData: FlGridData(
         show: true,
         drawVerticalLine: false,
-        getDrawingHorizontalLine: (v) =>
-            FlLine(color: Colors.white.withOpacity(0.06)),
+        getDrawingHorizontalLine:
+            (v) => FlLine(color: Colors.white.withOpacity(0.06)),
       ),
       borderData: FlBorderData(
         show: true,
@@ -157,7 +164,9 @@ class _MusicChart extends State<Music_Chart>{
       lineBarsData: [
         LineChartBarData(
           spots: List.generate(
-              count, (i) => FlSpot(i.toDouble(), points[i].toDouble())),
+            count,
+            (i) => FlSpot(i.toDouble(), points[i].toDouble()),
+          ),
           isCurved: true,
           color: Colors.cyanAccent,
           barWidth: 2.5,
@@ -180,10 +189,12 @@ class _MusicChart extends State<Music_Chart>{
           tooltipBgColor: Colors.black87,
           getTooltipItems: (List<LineBarSpot> touchedSpots) {
             return touchedSpots
-                .map((s) => LineTooltipItem(
-              s.y.toStringAsFixed(1),
-              const TextStyle(color: Colors.white, fontSize: 12),
-            ))
+                .map(
+                  (s) => LineTooltipItem(
+                    s.y.toStringAsFixed(1),
+                    const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                )
                 .toList();
           },
         ),
@@ -191,172 +202,157 @@ class _MusicChart extends State<Music_Chart>{
     );
   }
 
-
-
-
   //phát bài hát khi nhấn
   void playSong(Map<String, dynamic> song) async {
     final index = _topSongs.indexOf(song);
-    if(index != -1){
-      AudioManager().setPlaylist(_topSongs,index);
+    if (index != -1) {
+      AudioManager().setPlaylist(_topSongs, index);
     }
   }
   // hiển thị UI xếp hạng
 
-
   @override
-  Widget build(BuildContext){
-    final song = widget.playlist.isNotEmpty
-        ? widget.playlist.firstWhere(
-          (item) => item['id'] == 1,
-      orElse: () => widget.playlist.first, // fallback sang bài đầu tiên
-    )
-        : {
-      'color_light': '#9B76AA',
-      'color': '#52527A',
-      'color_dark': '#362350',
-    };
-    final Color colorLight  = hexToColor(song['color_light'] ?? '#9B76AA');
+  Widget build(BuildContext) {
+    final song =
+        widget.playlist.isNotEmpty
+            ? widget.playlist.firstWhere(
+              (item) => item['id'] == 1,
+              orElse: () => widget.playlist.first, // fallback sang bài đầu tiên
+            )
+            : {
+              'color_light': '#9B76AA',
+              'color': '#52527A',
+              'color_dark': '#362350',
+            };
+    final Color colorLight = hexToColor(song['color_light'] ?? '#9B76AA');
     final Color colorMedium = hexToColor(song['color'] ?? '#362350');
-    final Color colorDark   = hexToColor(song['color_dark'] ?? '#52527A');
+    final Color colorDark = hexToColor(song['color_dark'] ?? '#52527A');
 
     return Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(// Cho gradient chạy xuyên AppBar
-            backgroundColor: colorDark,
-            //column xếp các Widget con theo chiều dọc
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  },
-                icon: Icon(Icons.arrow_back, color: AppColors.white)),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        // Cho gradient chạy xuyên AppBar
+        backgroundColor: colorDark,
+        //column xếp các Widget con theo chiều dọc
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: AppColors.white),
+        ),
 
-            title: Text(
-              "#MUSIC.CHART",
-              style: TextStyle(
-                fontSize: 24,
-                color: AppColors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        title: Text(
+          "#MUSIC.CHART",
+          style: TextStyle(
+            fontSize: 24,
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
           ),
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  colorDark,
-                  colorMedium,
-                  colorLight,
-
-                ],
-                stops: [0.25, 0.90, 1.0],
-              ),
-            ),
-            child: Column (
-              children: [
-                if (_topSongs.isNotEmpty && _topSongs[0]['trend_points'] != null)
-                  SizedBox(
-                    width: 320,
-                    height: 250,
-                    child: LineChart(
-                      generateChart(List<int>.from(_topSongs[0]['trend_points'] ?? [])),
-
-                    ),
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [colorDark, colorMedium, colorLight],
+            stops: [0.25, 0.90, 1.0],
+          ),
+        ),
+        child: Column(
+          children: [
+            if (_topSongs.isNotEmpty && _topSongs[0]['trend_points'] != null)
+              SizedBox(
+                width: 320,
+                height: 250,
+                child: LineChart(
+                  generateChart(
+                    List<int>.from(_topSongs[0]['trend_points'] ?? []),
                   ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      border: Border(
-                        top: BorderSide(
-                          color: colorMedium,
-                          width: 1,
+                ),
+              ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  border: Border(top: BorderSide(color: colorMedium, width: 1)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                ),
+                child: ListView.builder(
+                  itemCount: _topSongs.length,
+                  itemBuilder: (context, index) {
+                    final song = _topSongs[index];
+                    return ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          song["cover"],
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(15),
+                      title: Text(
+                        song['title'],
+                        style: TextStyle(color: Colors.white),
                       ),
-                    ),
-                    child: ListView.builder(
-                      itemCount: _topSongs.length,
-                      itemBuilder: (context, index) {
-                        final song = _topSongs[index];
-                        return ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              song["cover"],
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text(
-                            song['title'],
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Text(
-                            song['artist'],
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                          trailing: Text(
-                            '#${song['rank']}',
-                            style: TextStyle(color: Colors.yellowAccent),
-                          ),
-                          onTap: () => playSong(song),// phát nhạc
-                        );
-                      },
-                    ),
-                  ),
-                )
-              ],
-              // hiển thị UI xếp hạng
-          ),
-
+                      subtitle: Text(
+                        song['artist'],
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      trailing: Text(
+                        '#${song['rank']}',
+                        style: TextStyle(color: Colors.yellowAccent),
+                      ),
+                      onTap: () => playSong(song), // phát nhạc
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+          // hiển thị UI xếp hạng
         ),
+      ),
       bottomNavigationBar: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [ // ✅ Gọi widget riêng
-        //miniPage
-        ValueListenableBuilder<Map<String, dynamic>?>(
-          valueListenable: AudioManager().currentSongNotifier,
-          builder: (context, currentSong, _) {
-            return currentSong == null
-                ? const SizedBox.shrink()
-                : MiniPlayer(playlist: AudioManager().playlist);
-          },
-        ),
-        //boton
-        Container(
-          height: 60,
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            boxShadow: [
-              BoxShadow(
-                color: colorDark,
-                blurRadius: 5,
-                offset: Offset(0, -1),
-              )
-            ],
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ✅ Gọi widget riêng
+          //miniPage
+          ValueListenableBuilder<Map<String, dynamic>?>(
+            valueListenable: AudioManager().currentSongNotifier,
+            builder: (context, currentSong, _) {
+              return currentSong == null
+                  ? const SizedBox.shrink()
+                  : MiniPlayer(playlist: AudioManager().playlist);
+            },
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              buildNavItem(Icons.library_music, 'Thư viện', 0),
-              buildNavItem(Icons.explore, 'Khám phá', 1),
-              buildNavItem(Icons.show_chart, '#Musicchart', 2),
-              buildNavItem(Icons.radio, 'Phòng nhạc', 3),
-              buildNavItem(Icons.person, 'Cá nhân', 4),
-            ],
+          //boton
+          Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              boxShadow: [
+                BoxShadow(
+                  color: colorDark,
+                  blurRadius: 5,
+                  offset: Offset(0, -1),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                buildNavItem(Icons.library_music, 'Thư viện', 0),
+                buildNavItem(Icons.explore, 'Khám phá', 1),
+                buildNavItem(Icons.show_chart, '#Musicchart', 2),
+                buildNavItem(Icons.radio, 'Phòng nhạc', 3),
+                buildNavItem(Icons.person, 'Cá nhân', 4),
+              ],
+            ),
           ),
-        ),
-      ],
-
-    )
+        ],
+      ),
     );
-
-
   }
 }

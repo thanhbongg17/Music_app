@@ -38,7 +38,6 @@ class _MiniPlayerState extends State<MiniPlayer> {
         final song = AudioManager().currentSong;
         if (song == null) return const SizedBox();
 
-
         return GestureDetector(
           //ấn quay trở lại màn hình Play_music
           onTap: () {
@@ -49,14 +48,15 @@ class _MiniPlayerState extends State<MiniPlayer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => PlayMusicPage(
-                    title: song['title'],
-                    artist: song['artist'],
-                    coverUrl: song['cover'],
-                    category: song['category'],
-                    playlist: widget.playlist,
-                    index: currentIndex,
-                  ),
+                  builder:
+                      (_) => PlayMusicPage(
+                        title: song['title'],
+                        artist: song['artist'],
+                        coverUrl: song['cover'],
+                        category: song['category'],
+                        playlist: widget.playlist,
+                        index: currentIndex,
+                      ),
                 ),
               );
             }
@@ -106,7 +106,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.grey[700],
-                          fontSize: 14,
+                          fontSize: 13.9,
                         ),
                       ),
                     ],
@@ -129,8 +129,8 @@ class _MiniPlayerState extends State<MiniPlayer> {
                         iconSize: 24,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () =>
-                        isPlaying ? _player.pause() : _player.play(),
+                        onPressed:
+                            () => isPlaying ? _player.pause() : _player.play(),
                       ),
                       IconButton(
                         icon: const Icon(Icons.skip_next),
@@ -146,7 +146,6 @@ class _MiniPlayerState extends State<MiniPlayer> {
             ),
           ),
         );
-
       },
     );
   }
