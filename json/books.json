@@ -1,0 +1,58 @@
+[
+  {
+    "rating": "5",
+    "title": "Đừng làm trái tim anh đau",
+    "text": "Sơn Tùng MTP",
+    "img": "assets/img/music_6.jpg",
+    "audio": "assets/music/Voices.mp3"
+  },
+  {
+    "rating": "4.5",
+    "title": "Ấn nút nhớ thả giấc mơ",
+    "text": "Sơn Tùng MTP",
+    "img": "assets/img/music_5.jpg",
+    "audio": "Voices.mp3"
+  },
+  {
+    "rating": "4.5",
+    "title": "Nơi này có anh",
+    "text": "Sơn Tùng MTP",
+    "img": "assets/img/music_3.jpg",
+    "audio": "Voices.mp3"
+  },
+  {
+  "rating": "4.5",
+  "title": "Chúng ta của hiện tại",
+  "text": "Sơn Tùng MTP",
+  "img": "assets/img/music_4.jpg",
+  "audio": "Voices.mp3"
+},
+  {
+    "rating": "4.5",
+    "title": "Thiên lý ơi",
+    "text": "Jack 5 củ",
+    "img": "assets/img/music_2.jpg",
+    "audio": "Voices.mp3"
+  },
+  {
+    "rating": "4.5",
+    "title": "Phạm Tiến Thành",
+    "text": "Thành",
+    "img": "assets/img/music_1.jpg",
+    "audio": "Voices.mp3"
+  },
+  {
+    "rating": "4.5",
+    "title": "Phạm Tiến Thành",
+    "text": "Thành",
+    "img": "assets/img/music_7.jpg",
+    "audio": "Voices.mp3"
+  },
+  {
+    "rating": "4.5",
+    "title": "Ánh Nguyệt",
+    "text": "Thành",
+    "img": "assets/img/music_7.jpg",
+    "audio": "Voices.mp3"
+  }
+]
